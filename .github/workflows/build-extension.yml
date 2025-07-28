@@ -38,7 +38,11 @@ jobs:
         
     - name: Install Dependencies
       run: |
-        npm ci || npm install
+        if [ -f "package-lock.json" ]; then
+          npm ci
+        else
+          npm install
+        fi
         
     - name: Compile Extension
       run: |
@@ -46,7 +50,11 @@ jobs:
         
     - name: Run Tests (if exists)
       run: |
-        npm test
+        if npm run | grep -q " test"; then
+          npm test
+        else
+          echo "No test script found"
+        fi
       continue-on-error: true
       
     - name: Package Extension
@@ -86,18 +94,6 @@ jobs:
         name: qcode-chat-extension
         path: ${{ steps.package.outputs.package_name }}
         retention-days: 30
-        
-    - name: Create GitHub Release
-      if: ${{ github.event.inputs.publish_to_marketplace == 'true' }}
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ steps.package.outputs.new_version }}
-        release_name: Release v${{ steps.package.outputs.new_version }}
-        draft: false
-        prerelease: false
         
     - name: Summary
       run: |
