@@ -1,0 +1,62 @@
+name: Code Quality Check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'media/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'media/**'
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install Dependencies
+      run: |
+        npm ci
+        
+    - name: Run ESLint
+      run: |
+        npm run lint
+        
+    - name: TypeScript Compilation Check
+      run: |
+        npm run compile -- --noEmit
+        
+    - name: Security Audit
+      run: |
+        npm audit --audit-level moderate
+      continue-on-error: true
+      
+    - name: Bundle Size Check
+      run: |
+        # Check if compiled output is reasonable
+        COMPILED_SIZE=$(du -sh out/ | cut -f1)
+        echo "Compiled output size: $COMPILED_SIZE"
+        
+        # Warn if larger than 10MB
+        SIZE_BYTES=$(du -sb out/ | cut -f1)
+        if [ $SIZE_BYTES -gt 10485760 ]; then
+          echo "::warning::Compiled output is larger than 10MB ($COMPILED_SIZE)"
+        fi
+        
+    - name: Dependency Check
+      run: |
+        # Check for outdated dependencies
+        npm outdated || echo "Some dependencies are outdated"
