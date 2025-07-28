@@ -191,6 +191,7 @@ export class ChatView {
             <div class="model-selector">
                 <label for="modelSelect">Model:</label>
                 <select id="modelSelect">
+                    <option value="qwen/qwen3-coder:free" selected>Qwen3 Coder (free)</option>
                     <option value="openai/gpt-3.5-turbo">GPT-3.5 Turbo</option>
                     <option value="google/gemini-pro">Gemini Pro</option>
                 </select>
@@ -203,8 +204,8 @@ export class ChatView {
             <div class="message assistant">
                 <div class="welcome-message">
                     <h3>👋 Welcome to QCode Chat!</h3>
-                    <p>I'm your AI coding assistant. Ask me anything about programming!</p>
-                    <p><small>Select a model from the dropdown and set your OpenRouter API key in Settings.</small></p>
+                    <p>I'm your AI coding assistant powered by Qwen3 Coder. Ask me anything about programming!</p>
+                    <p><small>Using <strong>Qwen3 Coder (free)</strong> as default model. Set your OpenRouter API key in Settings.</small></p>
                 </div>
             </div>
         </div>
@@ -234,4 +235,4 @@ export class ChatView {
 </body>
 </html>`;
     }
-              }
+}
