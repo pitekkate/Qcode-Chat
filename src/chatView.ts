@@ -182,5 +182,5 @@ export class ChatView {
   <script src="${scriptUri}"></script>
 </body>
 </html>`;
-  }
+    }
 }

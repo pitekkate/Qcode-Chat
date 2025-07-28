@@ -16,7 +16,7 @@ let name = "Budi";
 let age = 25;
 let isActive = true;
 \`\`\`
-Each variable stores different types of 
+Each variable stores different types of data:
 - Strings (text): "Budi"
 - Numbers: 25
 - Booleans (true/false): true`
@@ -234,10 +234,12 @@ console.log(isEven(7)); // false
           currentStep = Math.min(currentStep + 1, tutorial.steps.length - 1);
           panel.webview.html = this.getTutorialHtml(tutorial, currentStep);
           break;
+
         case 'prevStep':
           currentStep = Math.max(currentStep - 1, 0);
           panel.webview.html = this.getTutorialHtml(tutorial, currentStep);
           break;
+
         case 'completeTutorial':
           panel.dispose();
           vscode.window.showInformationMessage(`🎉 Congratulations! You completed the **${tutorial.title}** tutorial!`);
@@ -254,26 +256,86 @@ console.log(isEven(7)); // false
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); color: var(--vscode-editor-foreground); background-color: var(--vscode-editor-background); margin: 0; padding: 20px; }
-    .tutorial-container { max-width: 800px; margin: 0 auto; }
-    .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid var(--vscode-panel-border); }
-    .step-container { background-color: var(--vscode-editorWidget-background); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .step-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: var(--vscode-button-background); }
-    .step-content { line-height: 1.6; }
-    .step-content pre { background-color: var(--vscode-textCodeBlock-background); border: 1px solid var(--vscode-editorGroup-border); border-radius: 4px; padding: 15px; overflow-x: auto; margin: 15px 0; }
-    .step-content code { background-color: var(--vscode-textCodeBlock-background); padding: 2px 6px; border-radius: 3px; }
-    .navigation { display: flex; justify-content: space-between; margin-top: 30px; }
-    .nav-btn { background-color: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-    .nav-btn:hover { background-color: var(--vscode-button-hoverBackground); }
-    .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .progress { text-align: center; margin: 20px 0; color: var(--vscode-descriptionForeground); }
+    body {
+      font-family: var(--vscode-font-family);
+      font-size: var(--vscode-font-size);
+      color: var(--vscode-editor-foreground);
+      background-color: var(--vscode-editor-background);
+      margin: 0;
+      padding: 20px;
+    }
+    .tutorial-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--vscode-panel-border);
+    }
+    .step-container {
+      background-color: var(--vscode-editorWidget-background);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .step-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: var(--vscode-button-background);
+    }
+    .step-content {
+      line-height: 1.6;
+    }
+    .step-content pre {
+      background-color: var(--vscode-textCodeBlock-background);
+      border: 1px solid var(--vscode-editorGroup-border);
+      border-radius: 4px;
+      padding: 15px;
+      overflow-x: auto;
+      margin: 15px 0;
+    }
+    .step-content code {
+      background-color: var(--vscode-textCodeBlock-background);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+    .nav-btn {
+      background-color: var(--vscode-button-background);
+      color: var(--vscode-button-foreground);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .nav-btn:hover {
+      background-color: var(--vscode-button-hoverBackground);
+    }
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .progress {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 14px;
+      color: var(--vscode-descriptionForeground);
+    }
   </style>
 </head>
 <body>
   <div class="tutorial-container">
     <div class="header">
       <h1>${tutorial.title}</h1>
-      <p>Learn step by step</p>
+      <p>Learn step by step with interactive examples</p>
     </div>
     <div class="progress">Step ${currentStep + 1} of ${tutorial.steps.length}</div>
     <div class="step-container">
