@@ -18,6 +18,10 @@
     "copilot"
   ],
   "publisher": "pitekkate",
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/pitekkate/Qcode-Chat.git"
+  },
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#2d2d2d",
@@ -64,7 +68,7 @@
       }
     ],
     "viewContainers": {
-      "activitybar": {
+      "activityBar": {
         "id": "qcodeChat",
         "title": "QCode Chat",
         "icon": "./media/chat-icon.svg"
