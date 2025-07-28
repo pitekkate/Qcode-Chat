@@ -190,18 +190,12 @@ Please provide:
     }
 
     private static async sendMessageToChat(action: string, prompt: string) {
-        // Kirim pesan ke chat view melalui command
-        vscode.commands.executeCommand('qcode-chat.openChat');
-        
-        // Tunda sebentar untuk memastikan chat view terbuka
-        setTimeout(() => {
-            // Kirim pesan menggunakan command yang benar
-            vscode.commands.executeCommand('qcode-chat.handleMessage', {
-                command: 'sendMessageToChat', 
-                action: action, 
-                prompt: prompt 
-            });
-        }, 500);
+        // Kirim pesan ke webview menggunakan event
+        vscode.commands.executeCommand('qcode-chat.sendMessageToWebview', {
+            command: 'sendMessageToChat',
+            action: action,
+            prompt: prompt
+        });
     }
 
     private static async showTutorialInChat(tutorial: { title: string; content: string }) {
