@@ -141,6 +141,14 @@
             }
             modelSelect.appendChild(option);
         });
+        
+        // Ensure default model is selected if available
+        if (!modelSelect.querySelector('option[value="qwen/qwen3-coder:free"]')) {
+            const defaultOption = modelSelect.querySelector('option');
+            if (defaultOption) {
+                defaultOption.selected = true;
+            }
+        }
     }
 
     function scrollToBottom() {
@@ -175,5 +183,9 @@
     });
 
     // Initialize
-    vscode.postMessage({ command: 'loadModels' });
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set default model
+        modelSelect.value = 'qwen/qwen3-coder:free';
+        vscode.postMessage({ command: 'loadModels' });
+    });
 })();
