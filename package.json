@@ -17,7 +17,7 @@
     "openrouter",
     "copilot"
   ],
-  "publisher": "your-github-username",
+  "publisher": "pitekkate",
   "icon": "media/icon.png",
   "galleryBanner": {
     "color": "#2d2d2d",
@@ -25,11 +25,7 @@
   },
   "activationEvents": [
     "onView:qcodeChatView",
-    "onCommand:qcode-chat.openChat",
-    "onCommand:qcode-chat.explainCode",
-    "onCommand:qcode-chat.findBugs",
-    "onCommand:qcode-chat.generateExamples",
-    "onCommand:qcode-chat.tutorialMode"
+    "onCommand:qcode-chat.openChat"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -53,16 +49,26 @@
       {
         "command": "qcode-chat.tutorialMode",
         "title": "Start Tutorial Mode"
+      },
+      {
+        "command": "qcode-chat.detectErrors",
+        "title": "Detect & Fix Errors in File"
+      },
+      {
+        "command": "qcode-chat.explainError",
+        "title": "Explain Error Message"
+      },
+      {
+        "command": "qcode-chat.generatePracticeExercises",
+        "title": "Generate Practice Exercises"
       }
     ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "qcodeChat",
-          "title": "QCode Chat",
-          "icon": "./media/chat-icon.svg"
-        }
-      ]
+    "viewContainers": {
+      "activitybar": {
+        "id": "qcodeChat",
+        "title": "QCode Chat",
+        "icon": "./media/chat-icon.svg"
+      }
     },
     "views": {
       "qcodeChat": [
@@ -94,59 +100,43 @@
           "command": "qcode-chat.tutorialMode",
           "when": "editorTextFocus",
           "group": "navigation@4"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "qcode-chat.explainCode",
-          "when": "false"
         },
         {
-          "command": "qcode-chat.findBugs",
-          "when": "false"
+          "command": "qcode-chat.detectErrors",
+          "when": "editorTextFocus",
+          "group": "navigation@5"
         },
         {
-          "command": "qcode-chat.generateExamples",
-          "when": "false"
+          "command": "qcode-chat.explainError",
+          "when": "editorTextFocus",
+          "group": "navigation@6"
         },
         {
-          "command": "qcode-chat.tutorialMode",
-          "when": "false"
+          "command": "qcode-chat.generatePracticeExercises",
+          "when": "editorTextFocus",
+          "group": "navigation@7"
         }
       ]
     },
     "configuration": {
       "title": "QCode Chat",
       "properties": {
-        "qcode-chat.openrouterApiKey": {
+        "qcode-chat.apiKey": {
           "type": "string",
           "default": "",
           "description": "Your OpenRouter API key"
-        },
-        "qcode-chat.selectedModel": {
-          "type": "string",
-          "default": "qwen/qwen3-coder:free",
-          "description": "Selected AI model for chat"
-        },
-        "qcode-chat.beginnerMode": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable beginner-friendly explanations"
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run compile && node copyMedia.js",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
