@@ -11,14 +11,14 @@
   ],
   "icon": "media/icon.svg",
   "activationEvents": [
-    "onCommand:qcode-chat.helloWorld"
+    "onCommand:qcode-chat.openChat"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "qcode-chat.helloWorld",
-        "title": "Hello QCode Chat"
+        "command": "qcode-chat.openChat",
+        "title": "Open QCode Chat"
       }
     ]
   },
