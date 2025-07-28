@@ -32,7 +32,7 @@ Please provide:
 5. Best practices`;
 
         // Kirim ke chat view
-        this.sendMessageToChat('explainCode', prompt);
+        await this.sendMessageToChat('explainCode', prompt);
     }
 
     static async findBugs() {
@@ -64,7 +64,7 @@ Please provide:
 3. How to fix each issue
 4. Prevention tips for future`;
 
-        this.sendMessageToChat('findBugs', prompt);
+        await this.sendMessageToChat('findBugs', prompt);
     }
 
     static async generateExamples(topic: string) {
@@ -80,7 +80,7 @@ Please provide:
 4. Best practices
 5. Things to avoid`;
 
-        this.sendMessageToChat('generateExamples', prompt);
+        await this.sendMessageToChat('generateExamples', prompt);
     }
 
     static async tutorialMode(topic: string) {
@@ -186,7 +186,7 @@ Please provide:
         const tutorial = tutorials[topic as keyof typeof tutorials] || tutorials['variables'];
         
         // Tampilkan tutorial di chat
-        this.showTutorialInChat(tutorial);
+        await this.showTutorialInChat(tutorial);
     }
 
     private static async sendMessageToChat(action: string, prompt: string) {
@@ -202,7 +202,7 @@ Please provide:
         return null;
     }
 
-    private static showTutorialInChat(tutorial: { title: string; content: string }) {
+    private static async showTutorialInChat(tutorial: { title: string; content: string }) {
         // Placeholder untuk menampilkan tutorial di chat
         vscode.window.showInformationMessage(`${tutorial.title}: ${tutorial.content.substring(0, 100)}...`);
     }
