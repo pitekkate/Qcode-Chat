@@ -1,0 +1,133 @@
+name: Build QCode Chat Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      create_release:
+        description: 'Create GitHub Release?'
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install Dependencies
+      run: |
+        npm ci
+        
+    - name: Compile Extension
+      run: |
+        npm run compile
+        
+    - name: Run Tests (if exists)
+      run: |
+        npm test
+      continue-on-error: true
+      
+    - name: Package Extension
+      id: package
+      run: |
+        # Install vsce
+        npm install -g @vscode/vsce
+        
+        # Get current version
+        VERSION=$(node -p "require('./package.json').version")
+        echo "Current version: $VERSION"
+        
+        # Bump version based on input
+        if [ "${{ github.event.inputs.version_bump }}" = "major" ]; then
+          NEW_VERSION=$(node -p "v='$VERSION'; [v.split('.')[0]*1+1, 0, 0].join('.')")
+        elif [ "${{ github.event.inputs.version_bump }}" = "minor" ]; then
+          NEW_VERSION=$(node -p "v='$VERSION'; parts=v.split('.'); [parts[0], parts[1]*1+1, 0].join('.')")
+        else
+          NEW_VERSION=$(node -p "v='$VERSION'; parts=v.split('.'); [parts[0], parts[1], parts[2]*1+1].join('.')")
+        fi
+        
+        echo "New version: $NEW_VERSION"
+        
+        # Update package.json version
+        npm version $NEW_VERSION --no-git-tag-version
+        
+        # Package extension
+        PACKAGE_NAME="qcode-chat-${NEW_VERSION}.vsix"
+        vsce package -o $PACKAGE_NAME
+        
+        echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        
+    - name: Upload VSIX Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: qcode-chat-extension
+        path: ${{ steps.package.outputs.package_name }}
+        retention-days: 30
+        
+    - name: Create GitHub Release
+      if: ${{ github.event.inputs.create_release == 'true' }}
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.package.outputs.new_version }}
+        release_name: Release v${{ steps.package.outputs.new_version }}
+        draft: false
+        prerelease: false
+        body: |
+          ## QCode Chat v${{ steps.package.outputs.new_version }}
+          
+          ### Changes in this release:
+          - Automated build from GitHub Actions
+          - Extension packaged and ready for use
+          
+          ### Installation:
+          1. Download the `.vsix` file
+          2. In VS Code, run `Extensions: Install from VSIX...` command
+          3. Select the downloaded file
+          
+          ### Manual Installation:
+          ```bash
+          code --install-extension ${{ steps.package.outputs.package_name }}
+          ```
+
+    - name: Upload Release Asset
+      if: ${{ github.event.inputs.create_release == 'true' }}
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ steps.package.outputs.package_name }}
+        asset_name: ${{ steps.package.outputs.package_name }}
+        asset_content_type: application/octet-stream
+        
+    - name: Summary
+      run: |
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- Version bumped to: ${{ steps.package.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Package created: ${{ steps.package.outputs.package_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- GitHub Release: ${{ github.event.inputs.create_release == 'true' && 'Created' || 'Not created' }}" >> $GITHUB_STEP_SUMMARY
+      
