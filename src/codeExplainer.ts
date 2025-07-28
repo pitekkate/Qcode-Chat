@@ -195,25 +195,13 @@ Please provide:
         
         // Tunda sebentar untuk memastikan chat view terbuka
         setTimeout(() => {
-            const chatView = this.getChatViewInstance();
-            if (chatView) {
-                // Kirim pesan ke chat view jika tersedia
-                vscode.postMessage({ 
-                    command: 'sendMessageToChat', 
-                    action: action, 
-                    prompt: prompt 
-                });
-            } else {
-                // Fallback: Kirim sebagai command biasa
-                vscode.window.showInformationMessage(`[${action}] ${prompt.substring(0, 100)}...`);
-            }
+            // Kirim pesan menggunakan command yang benar
+            vscode.commands.executeCommand('qcode-chat.handleMessage', {
+                command: 'sendMessageToChat', 
+                action: action, 
+                prompt: prompt 
+            });
         }, 500);
-    }
-
-    private static getChatViewInstance(): any | null {
-        // Placeholder untuk mendapatkan instance chat view
-        // Dalam implementasi sebenarnya, ini akan mengembalikan instance chat view
-        return null;
     }
 
     private static async showTutorialInChat(tutorial: { title: string; content: string }) {
