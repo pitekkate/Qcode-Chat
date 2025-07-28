@@ -84,7 +84,7 @@ Please provide:
     }
 
     static async tutorialMode(topic: string) {
-        const tutorials = {
+        const tutorials: { [key: string]: { title: string; content: string } } = {
             'variables': {
                 title: 'Understanding Variables',
                 content: `Variables are like boxes that store information. Let's learn step by step:
@@ -183,27 +183,54 @@ Please provide:
             }
         };
 
-        const tutorial = tutorials[topic as keyof typeof tutorials] || tutorials['variables'];
+        const tutorial = tutorials[topic] || tutorials['variables'];
         
         // Tampilkan tutorial di chat
         await this.showTutorialInChat(tutorial);
     }
 
     private static async sendMessageToChat(action: string, prompt: string) {
-        // Ini akan mengirim pesan ke chat view
-        const chatView = await this.getChatView();
-        if (chatView) {
-            chatView.sendMessageToChat(prompt, action);
-        }
+        // Kirim pesan ke chat view melalui command
+        vscode.commands.executeCommand('qcode-chat.openChat');
+        
+        // Tunda sebentar untuk memastikan chat view terbuka
+        setTimeout(() => {
+            const chatView = this.getChatViewInstance();
+            if (chatView) {
+                // Kirim pesan ke chat view jika tersedia
+                vscode.postMessage({ 
+                    command: 'sendMessageToChat', 
+                    action: action, 
+                    prompt: prompt 
+                });
+            } else {
+                // Fallback: Kirim sebagai command biasa
+                vscode.window.showInformationMessage(`[${action}] ${prompt.substring(0, 100)}...`);
+            }
+        }, 500);
     }
 
-    private static async getChatView() {
+    private static getChatViewInstance(): any | null {
         // Placeholder untuk mendapatkan instance chat view
+        // Dalam implementasi sebenarnya, ini akan mengembalikan instance chat view
         return null;
     }
 
     private static async showTutorialInChat(tutorial: { title: string; content: string }) {
-        // Placeholder untuk menampilkan tutorial di chat
-        vscode.window.showInformationMessage(`${tutorial.title}: ${tutorial.content.substring(0, 100)}...`);
+        // Tampilkan tutorial menggunakan notification
+        const selection = await vscode.window.showInformationMessage(
+            `${tutorial.title}: ${tutorial.content.substring(0, 100)}...`,
+            'View Full Tutorial',
+            'Close'
+        );
+        
+        if (selection === 'View Full Tutorial') {
+            // Buat dokumen baru dengan konten tutorial
+            const doc = await vscode.workspace.openTextDocument({
+                content: `# ${tutorial.title}\n\n${tutorial.content}`,
+                language: 'markdown'
+            });
+            await vscode.window.showTextDocument(doc);
+        }
     }
 }
