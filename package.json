@@ -9,6 +9,7 @@
   "categories": [
     "Other"
   ],
+  "icon": "media/icon.svg",
   "activationEvents": [
     "onCommand:qcode-chat.helloWorld"
   ],
