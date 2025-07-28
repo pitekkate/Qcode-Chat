@@ -12,12 +12,7 @@ on:
           - patch
           - minor
           - major
-      create_release:
-        description: 'Create GitHub Release?'
-        required: true
-        default: true
-        type: boolean
-
+    
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,9 +29,16 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
+    - name: Create package-lock.json if not exists
+      run: |
+        if [ ! -f "package-lock.json" ]; then
+          echo "Creating package-lock.json..."
+          npm install --package-lock-only
+        fi
+        
     - name: Install Dependencies
       run: |
-        npm ci
+        npm ci || npm install
         
     - name: Compile Extension
       run: |
@@ -86,7 +88,7 @@ jobs:
         retention-days: 30
         
     - name: Create GitHub Release
-      if: ${{ github.event.inputs.create_release == 'true' }}
+      if: ${{ github.event.inputs.publish_to_marketplace == 'true' }}
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -96,38 +98,9 @@ jobs:
         release_name: Release v${{ steps.package.outputs.new_version }}
         draft: false
         prerelease: false
-        body: |
-          ## QCode Chat v${{ steps.package.outputs.new_version }}
-          
-          ### Changes in this release:
-          - Automated build from GitHub Actions
-          - Extension packaged and ready for use
-          
-          ### Installation:
-          1. Download the `.vsix` file
-          2. In VS Code, run `Extensions: Install from VSIX...` command
-          3. Select the downloaded file
-          
-          ### Manual Installation:
-          ```bash
-          code --install-extension ${{ steps.package.outputs.package_name }}
-          ```
-
-    - name: Upload Release Asset
-      if: ${{ github.event.inputs.create_release == 'true' }}
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ steps.package.outputs.package_name }}
-        asset_name: ${{ steps.package.outputs.package_name }}
-        asset_content_type: application/octet-stream
         
     - name: Summary
       run: |
         echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
         echo "- Version bumped to: ${{ steps.package.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
         echo "- Package created: ${{ steps.package.outputs.package_name }}" >> $GITHUB_STEP_SUMMARY
-        echo "- GitHub Release: ${{ github.event.inputs.create_release == 'true' && 'Created' || 'Not created' }}" >> $GITHUB_STEP_SUMMARY
-      
